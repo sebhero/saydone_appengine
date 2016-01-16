@@ -1,0 +1,217 @@
+{
+  "extends" : "thirdParty.api",
+  "abstract" : false,
+  "root" : "https://say-done.appspot.com/_ah/api",
+  "name" : "taskitemendpoint",
+  "version" : "v1",
+  "defaultVersion" : false,
+  "adapter" : {
+    "bns" : "https://say-done.appspot.com/_ah/spi",
+    "deadline" : 65.0,
+    "type" : "lily"
+  },
+  "auth" : {
+    "allowCookieAuth" : false
+  },
+  "frontendLimits" : {
+    "unregisteredUserQps" : -1,
+    "unregisteredQps" : -1,
+    "unregisteredDaily" : -1,
+    "rules" : [ ]
+  },
+  "cacheControl" : {
+    "type" : "no-cache",
+    "maxAge" : 0
+  },
+  "ownerDomain" : "boreback.com",
+  "ownerName" : "boreback.com",
+  "packagePath" : "saydone.entity",
+  "methods" : {
+    "taskitemendpoint.listTaskItem" : {
+      "path" : "taskitem",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.boreback.saydone.entity.TaskItemEndpoint.listTaskItem",
+      "request" : {
+        "parameters" : {
+          "cursor" : {
+            "type" : "string",
+            "required" : false
+          },
+          "limit" : {
+            "type" : "int32",
+            "required" : false
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "taskitemendpoint.removeTaskItem" : {
+      "path" : "taskitem/{id}",
+      "httpMethod" : "DELETE",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "721477199484-4sv11th1kbmtpfuovj1gvv5qcsn9r9na.apps.googleusercontent.com", "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.boreback.saydone.entity.TaskItemEndpoint.removeTaskItem",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "int64",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "empty"
+      }
+    },
+    "taskitemendpoint.insertTaskItem" : {
+      "path" : "taskitem",
+      "httpMethod" : "POST",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "721477199484-4sv11th1kbmtpfuovj1gvv5qcsn9r9na.apps.googleusercontent.com", "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.boreback.saydone.entity.TaskItemEndpoint.insertTaskItem",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "taskitemendpoint.updateTaskItem" : {
+      "path" : "taskitem",
+      "httpMethod" : "PUT",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "721477199484-4sv11th1kbmtpfuovj1gvv5qcsn9r9na.apps.googleusercontent.com", "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.boreback.saydone.entity.TaskItemEndpoint.updateTaskItem",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "taskitemendpoint.getTaskItem" : {
+      "path" : "taskitem/{id}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.boreback.saydone.entity.TaskItemEndpoint.getTaskItem",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "int64",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    }
+  },
+  "descriptor" : {
+    "schemas" : {
+      "CollectionResponse_TaskItem" : {
+        "id" : "CollectionResponse_TaskItem",
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "TaskItem"
+            }
+          },
+          "nextPageToken" : {
+            "type" : "string"
+          }
+        }
+      },
+      "TaskItem" : {
+        "id" : "TaskItem",
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "taskID" : {
+            "type" : "integer"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "minTime" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "maxTime" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "avgTime" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "totalTime" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "totalDones" : {
+            "type" : "integer"
+          },
+          "isDone" : {
+            "type" : "boolean"
+          }
+        }
+      }
+    },
+    "methods" : {
+      "com.boreback.saydone.entity.TaskItemEndpoint.listTaskItem" : {
+        "response" : {
+          "$ref" : "CollectionResponse_TaskItem"
+        }
+      },
+      "com.boreback.saydone.entity.TaskItemEndpoint.removeTaskItem" : {
+      },
+      "com.boreback.saydone.entity.TaskItemEndpoint.insertTaskItem" : {
+        "request" : {
+          "$ref" : "TaskItem"
+        },
+        "response" : {
+          "$ref" : "TaskItem"
+        }
+      },
+      "com.boreback.saydone.entity.TaskItemEndpoint.updateTaskItem" : {
+        "request" : {
+          "$ref" : "TaskItem"
+        },
+        "response" : {
+          "$ref" : "TaskItem"
+        }
+      },
+      "com.boreback.saydone.entity.TaskItemEndpoint.getTaskItem" : {
+        "response" : {
+          "$ref" : "TaskItem"
+        }
+      }
+    }
+  }
+}

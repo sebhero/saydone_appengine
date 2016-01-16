@@ -1,0 +1,215 @@
+<!doctype html>
+<html ng-app="todo">
+<head>
+
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+
+</head>
+<body>
+<div class="hero-unit">
+    <h2>Endpoints Todos</h2>
+    <div ng-controller="TodoCtrl">
+        <p><span>{{remaining()}} of {{todos.length}} remaining</span>
+            <!--[ <a href="" ng-click="archive()">archive</a> ]</p>-->
+        <ul class="unstyled">
+            <li ng-repeat="todo in todos">
+                <div>{{todo.title}}</div>
+                <!--<input id="todo-{{todo.id}}" type="checkbox" ng-model="todo.done" ng-change="change(todo)" ng-disabled="disabled(todo)">-->
+                <!--<label for="todo-{{todo.id}}" class="done-{{todo.done}}">{{todo.text}}</label>-->
+            </li>
+        </ul>
+        <form ng-submit="addTodo()">
+            <input type="text" ng-model="todoText"  size="30"
+                   placeholder="add new todo here">
+            <input class="btn-primary" type="submit" value="add">
+        </form>
+       <button ng-click="loginGapi()">Login to google</button>
+       <button ng-click="logoutGapi()">{{username}}logout from google</button>
+       <button ng-click="insertGapi()">add gapi</button>
+    </div>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular-resource.min.js"></script>
+<!--<script src="/js/todo.js"></script>-->
+<script>
+
+    var google_scopes = 'https://www.googleapis.com/auth/userinfo.email';
+    var google_client_id = '721477199484-4sv11th1kbmtpfuovj1gvv5qcsn9r9na.apps.googleusercontent.com';
+
+
+    function init() {
+        console.log("loaded init");
+        var apisToLoad;
+
+        //called when server connection is setup
+        var callback = function() {
+
+            console.log("done loading gapi");
+            if (--apisToLoad == 0) {
+                //auto logon
+                // signin(true, handleAuth);
+            }
+            //load the list from server
+        }
+
+        apisToLoad = 2;
+        //Parameters are APIName,APIVersion,CallBack function,API Root
+        var apiRoot = '//' + window.location.host + '/_ah/api';
+//        gapi.client.load('taskitemendpoint', 'v1', callback, apiRoot);
+        gapi.client.load('oauth2','v2',callback);
+        gapi.client.load('taskitemendpoint', 'v1', callback, apiRoot);
+    }
+
+
+
+    function signin(mode, callback) {
+        gapi.auth.authorize({client_id: google_client_id,scope: google_scopes, immediate: mode},callback);
+    }
+
+
+//    .factory('Todo', function($resource) {
+//        var Todo = $resource('/_ah/api/testtaskendpoint/v1/testtask/:id', {id: '@id'}, {
+//            query: {method: 'GET', isArray: false},
+//            update: {method: 'PUT'}
+//        });
+//        return Todo;
+//    })
+
+    angular.module('todo', ['ngResource'])
+            .factory('Todo', function($resource) {
+                var Todo = $resource('/_ah/api/taskitemendpoint/v1/taskitem/:id', {id: '@id'}, {
+                    query: {method: 'GET', isArray: false},
+                    update: {method: 'PUT'}
+                });
+                return Todo;
+            })
+            .controller('TodoCtrl', function($scope, Todo) {
+                //get all from rest point
+                Todo.query(function(response) {
+                    $scope.todos = [];
+                    angular.forEach(response.items, function(item) {
+                        var todo = new Todo();
+                        todo.title= item.title;
+                        todo.id = item.id;
+                        $scope.todos.push(todo);
+                    });
+                });
+
+                $scope.addTodo = function() {
+                    var todo = new Todo();
+                    todo.title = $scope.todoText;
+//                        todo.done = false;
+                    todo.$save();
+                    $scope.todos.push(todo);
+                    $scope.todoText = '';
+                };
+
+
+                $scope.insertGapi= function()
+                {
+
+                    var newTask = {};
+
+                    newTask.title = $scope.todoText;
+                    console.log("added to server");
+                    gapi.client.taskitemendpoint.insertTaskItem(newTask).execute(function(resp) {
+                        console.log(resp);
+                        if (!resp.code) {
+                            //Just logging to console now, you can do your check here/display message
+                            console.log("succes! "+resp.id + ":" + resp.title);
+                            console.log(JSON.stringify(resp));
+                            $scope.$apply(function()
+                            {
+                                console.log("after apply");
+                                $scope.todos.push(resp);
+                                $scope.todoText = '';
+
+                            });
+
+
+                            }
+                        else {
+                            console.log(resp.code + " : " + resp.titel);
+                            alert("Error : " + resp.code + ":" + resp.titel+" Did you login??");
+                        }
+                    });
+                }
+
+                $scope.change = function(todo) {
+                    todo.$update();
+                }
+
+                $scope.remaining = function() {
+                    var count = 0;
+                    angular.forEach($scope.todos, function(todo) {
+                        count += 1;
+                    });
+                    return count;
+                };
+
+                $scope.loginGapi = function()
+                {
+                    signin(false,$scope.handleAuth);
+
+                };
+
+                $scope.checkSession = function()
+                {
+//
+//                    sessionParams = {
+//                        'client_id': google_client_id,
+//                        'session_state': null
+//                    };
+                    //TODO fixa sa att en kolla endast mitt app.
+                    gapi.auth.checkSessionState({client_id:google_client_id},$scope.sessionStateCallback);
+
+                }
+
+                $scope.logoutGapi = function()
+                {
+                    console.log("doing logout");
+                    //	var ac_token = gapi.auth.getToken();
+                    gapi.auth.setToken(null);
+                    gapi.auth.signOut();
+                    $scope.checkSession();
+                };
+
+
+
+                $scope.sessionStateCallback = function(resp)
+                {
+                   console.log("session is [ "+resp+" ] if is false, your logged in");
+//                    console.log("session is "+JSON.stringify(resp));
+
+                }
+
+                $scope.handleAuth= function() {
+                    var request = gapi.client.oauth2.userinfo.get().execute(function(resp) {
+                        if (!resp.code) {
+                            // User is signed in, so hide the button
+                            console.log($scope.username+" login user: "+resp.name);
+                            $scope.checkSession();
+//                            $scope.test(resp);
+                            $scope.$apply(function()
+                                {
+                                    $scope.username = "welcome "+resp.name+" ";
+                                });
+
+                        }
+                        else {
+                            console.log("user logged off")
+                        }
+                    });
+                };
+
+
+
+            });
+
+
+</script>
+<script src="https://apis.google.com/js/client.js?onload=init"></script>
+
+</body>
+</html>

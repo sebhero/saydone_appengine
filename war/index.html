@@ -1,0 +1,231 @@
+ <!DOCTYPE html>
+<html lang="en" ng-app="todo">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="Sebastian Boreback">
+        <link rel="shortcut icon" href="">
+        <title>Say Done!</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="./css/bootstrap.css" rel="stylesheet">
+        <link href="./css/bootstrap-theme.min.css" rel="stylesheet">
+        <link href="./css/main.css" rel="stylesheet">
+<!--
+        /*We will import 2 fonts*/
+        /*fontawesome iconfont*/
+-->
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+<!--        checkbox-->
+
+        <!-- Custom styles for this template -->
+        <style>body{padding-top:50px;}.starter-template{padding:40px 15px;text-align:center;}</style>
+    </head>
+
+    <body ng-controller="TodoCtrl">
+        <nav class="navbar navbar-inverse navbar-fixed-top" appRole="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Say Done!</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#">Home</a></li>
+                        <li><a data-toggle="modal" data-target="#about">About</a></li>
+                        <li><a data-toggle="modal" data-target="#contact">Contacts</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                    <li>
+                          <button ng-show="!signedIn" ng-click="loginGapi()" type="button" class="btn btn-primary btn-sm navbar-btn" >Sign in</button>
+                          <button ng-show="signedIn" ng-click="logout()" type="button" class="btn btn-primary btn-sm navbar-btn">Sign out {{username}}</button>
+                    </li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </nav>
+        <div class="container" >
+            <div class="starter-template">
+                <h1>Say Done!</h1>
+                <p class="lead">A simple Task - todo list and measure performance app.</p>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Add a new Task</h3>
+                </div>
+                <div class="panel-body">
+                   <form class="form-inline" appRole="form" action="javascript:void(0);">
+                        <input ng-model="todoText" type="text" class="form-control" placeholder="Title of task">
+                        <button ng-disabled="!signedIn" ng-click="insertTask()" class="btn btn-default">Add Task</button>
+                    </form>
+                    <div>
+                        <br>
+                        Filter: <input type="text" placeholder="Search for task" ng-model="searchText">
+
+                        <span  ng-show="todos.length>0 && selected">
+                            <button class="btn btn-primary btn-xs" ng-click="selected=false; isDoneFilter = {isDone:false}">Filter dones</button>
+                        </span>
+                        <span ng-show="!selected">
+                            <button class="btn btn-primary btn-xs" ng-click="selected=true; isDoneFilter = undefined">show all</button>
+                        </span>
+                    </div>
+                    <!--End of insert Panel-->
+                </div>
+
+                <!--<div ng-show="showResult" ng-class="resultType" class="alert alert-dismissible" appRole="alert" hide-me="isHidden">-->
+                <div ng-class="resultType" class="alert alert-dismissible"
+                     style="display:none" appRole="alert" hide-me="isHidden">
+                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <strong>Warning!</strong> {{resultMessage}}.
+                </div>
+            </div>
+            <!--					end of form-->
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                    <h3 class="panel-title">List of Tasks</h3>
+                </div>
+                <div class="panel-body">
+
+                    <ul sv-root sv-part="todos" style="list-style-type:none; padding:0;" class="newCheckboxStyle">
+                        <li ng-show="!todos.length">No Tasks!</li>
+                        <li ng-show="!signedIn">You need to sign in, to work with the tasks</li>
+                        <!-- TaskTemplate-->
+                        <!-- <li draggable="true" id="taskLiTemplate">-->
+                        <!--<li draggable="true" ng-repeat="todo in todos">-->
+                        <!--<li ng-repeat="todo in todos | filter:searchText | filter:{isDone:switchState.isOn}" sv-element>-->
+                        <li ng-repeat="todo in todos | filter:searchText | filter:isDoneFilter" sv-element>
+                            <div >
+                                <div class="input-group" >
+                                    <span class="input-group-addon">
+                                        <input ng-disabled="!signedIn" id="chk{{$index}}" type="checkbox" ng-model="todo.isDone" ng-change="doneTask(todo)"/>
+                                        <label for="chk{{$index}}"></label>
+                                        <span class="label label-default currentTimeLabel"><span ng-if="todo.currentTime">{{todo.currentTime.hours}}:{{todo.currentTime.minutes}}:{{todo.currentTime.secounds}}</span><span ng-if="!todo.currentTime"></span><span ng-if="todo.avgTime">{{todo.avgTime | date:'H:mm:ss'}}</span></span>
+                                    </span>
+                                    <button  href="#collapse{{$index}}" class="taskBtn form-control text-left" data-toggle="collapse" ng-style="todo.isDone? {'text-decoration': 'line-through'} : {} ">{{todo.title}}<span class="glyphicon glyphicon-chevron-right subTaskInfoBtn"></span></button>
+                                        <span class="input-group-btn">
+                                            <button ng-disabled="todo.isDone || !signedIn" ng-click="toggleTimer(todo)" class="btn btn-default btn-play" type="button" >
+                                                <span ng-class="((todo.isRunning) || (todo.isRunning === undefined) ) ? 'glyphicon glyphicon-play glyp-green' :'glyphicon glyphicon-pause glyp-pause'" ></span>
+                                            </button>
+                                    </span>
+                                </div>
+
+                                <!--end of input group-->
+                                <div id="collapse{{$index}}" class="panel-collapse collapse taskInfo">
+                                    <div>
+                                        <form appRole="form" class="form-horizontal" action="javascript:void(0);">
+                                            <div class="form-group">
+                                                <br>
+                                                <label class="control-label col-xs-4">Avg: <span class="label label-info">{{todo.avgTime | date:'H:mm:ss'}}<span ng-if="!todo.avgTime">0:00:00</span></span></label>
+                                                <label class="control-label col-xs-4">Min: <span class="label label-success">{{todo.minTime | date:'H:mm:ss'}}<span ng-if="!todo.minTime">0:00:00</span></span></label>
+                                                <label class="control-label col-xs-4">Max: <span class="label label-warning">{{todo.maxTime | date:'H:mm:ss'}}<span ng-if="!todo.maxTime">0:00:00</span></span></label>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="inputTitle" class="control-label col-xs-2">Title</label>
+                                                <div class="col-xs-10">
+                                                    <input ng-disabled="!signedIn" id="inputTitle" class="form-control" type="text" ng-model="todo.title">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-xs-offset-2 col-xs-10">
+                                                    <button ng-disabled="!signedIn" class="btn btn-primary" ng-click="updateTask(todo)">Save</button>
+                                                    <button class="btn btn-danger">Reset Time</button>
+                                                    <button ng-disabled="!signedIn" ng-click="removeTask(todo,$index)" class="btn btn-danger">Delete task</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                 <!--end of form for editing-->
+                                </div>
+                            </div>
+                        </li>
+                        <!-- End of Li for task Template-->
+                    </ul>
+                </div>
+            </div>
+            <!--end of contianer-->
+        </div>
+
+
+        
+        <div class="modal fade" id="about">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+		        <h4 class="modal-title">Showcase About</h4>
+		      </div>
+		      <div class="modal-body">
+		        <div class="alert alert-warning" appRole="alert"><p class="text-center">This is a Task app!</p>
+		        <br>This webapp only <strong>supports Firefox and Chrome and IE 11+</strong>
+                </div>
+                <br>The special thing with this Task app is that you can messaure the time it take to do a task.
+                <br>Making you improve your skills and performing different tasks.
+              </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-info center-block" data-dismiss="modal">Okay</button>
+		      </div>
+		    </div><!-- /.modal-content -->
+		  </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+
+        <div class="modal fade" id="contact">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+		        <h4 class="modal-title">Say-done contact infot</h4>
+		      </div>
+		      <div class="modal-body">
+                To contact us, please email us at,
+                <br>
+                <br>
+                <h5><a href="mailto:contact@say-done.appspotmail.com"><span class="label label-primary">contact@say-done.appspotmail.com</span></a></h5>
+              </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-info center-block" data-dismiss="modal">Okay</button>
+		      </div>
+		    </div><!-- /.modal-content -->
+		  </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+        
+        
+        <!--End of start info-->
+        <!--			end of container-->
+
+        <!--aNGular load-->
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular-animate.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular-resource.min.js"></script>
+
+        <!--<script src="js/angular-timer.min.js"></script>-->
+
+
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="js/jquery-2.1.1.min.js"></script>
+
+        <!-- compiled and minified Bootstrap JavaScript -->
+        <script src="js/bootstrap.min.js"></script>
+        <!--  for animations using tweenmax -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+        <!--        circal precentage-->
+        <!--<script src="js/jquery.percentageloader-0.1.js"></script>-->
+
+
+        <!--Main JS-->
+        <script src="js/mainAngular.js"></script>
+
+        <!--GAPI-->
+        <script src="https://apis.google.com/js/client.js?onload=init"></script>
+
+
+    </body>
+</html>

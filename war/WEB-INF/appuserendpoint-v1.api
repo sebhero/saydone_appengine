@@ -1,0 +1,206 @@
+{
+  "extends" : "thirdParty.api",
+  "abstract" : false,
+  "root" : "https://say-done.appspot.com/_ah/api",
+  "name" : "appuserendpoint",
+  "version" : "v1",
+  "defaultVersion" : false,
+  "adapter" : {
+    "bns" : "https://say-done.appspot.com/_ah/spi",
+    "deadline" : 65.0,
+    "type" : "lily"
+  },
+  "auth" : {
+    "allowCookieAuth" : false
+  },
+  "frontendLimits" : {
+    "unregisteredUserQps" : -1,
+    "unregisteredQps" : -1,
+    "unregisteredDaily" : -1,
+    "rules" : [ ]
+  },
+  "cacheControl" : {
+    "type" : "no-cache",
+    "maxAge" : 0
+  },
+  "ownerDomain" : "boreback.com",
+  "ownerName" : "boreback.com",
+  "packagePath" : "saydone.entity",
+  "methods" : {
+    "appuserendpoint.getAppUser" : {
+      "path" : "appuser/{id}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.boreback.saydone.entity.AppUserEndpoint.getAppUser",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "int64",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "appuserendpoint.listAppUser" : {
+      "path" : "appuser",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.boreback.saydone.entity.AppUserEndpoint.listAppUser",
+      "request" : {
+        "parameters" : {
+          "cursor" : {
+            "type" : "string",
+            "required" : false
+          },
+          "limit" : {
+            "type" : "int32",
+            "required" : false
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "appuserendpoint.removeAppUser" : {
+      "path" : "appuser/{id}",
+      "httpMethod" : "DELETE",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.boreback.saydone.entity.AppUserEndpoint.removeAppUser",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "int64",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "empty"
+      }
+    },
+    "appuserendpoint.insertAppUser" : {
+      "path" : "appuser",
+      "httpMethod" : "POST",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.boreback.saydone.entity.AppUserEndpoint.insertAppUser",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "appuserendpoint.updateAppUser" : {
+      "path" : "appuser",
+      "httpMethod" : "PUT",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.boreback.saydone.entity.AppUserEndpoint.updateAppUser",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    }
+  },
+  "descriptor" : {
+    "schemas" : {
+      "AppUser" : {
+        "id" : "AppUser",
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "role" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "AppRole"
+            }
+          },
+          "susspende" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "AppRole" : {
+        "id" : "AppRole",
+        "type" : "string",
+        "enum" : [ "ADMIN", "USER", "OTHER" ]
+      },
+      "CollectionResponse_AppUser" : {
+        "id" : "CollectionResponse_AppUser",
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "AppUser"
+            }
+          },
+          "nextPageToken" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "methods" : {
+      "com.boreback.saydone.entity.AppUserEndpoint.getAppUser" : {
+        "response" : {
+          "$ref" : "AppUser"
+        }
+      },
+      "com.boreback.saydone.entity.AppUserEndpoint.listAppUser" : {
+        "response" : {
+          "$ref" : "CollectionResponse_AppUser"
+        }
+      },
+      "com.boreback.saydone.entity.AppUserEndpoint.removeAppUser" : {
+      },
+      "com.boreback.saydone.entity.AppUserEndpoint.insertAppUser" : {
+        "request" : {
+          "$ref" : "AppUser"
+        },
+        "response" : {
+          "$ref" : "AppUser"
+        }
+      },
+      "com.boreback.saydone.entity.AppUserEndpoint.updateAppUser" : {
+        "request" : {
+          "$ref" : "AppUser"
+        },
+        "response" : {
+          "$ref" : "AppUser"
+        }
+      }
+    }
+  }
+}

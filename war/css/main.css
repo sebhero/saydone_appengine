@@ -1,0 +1,104 @@
+
+.bs-surround {
+	margin: 5px;
+	padding: 6px 10px 5px 10px ;
+	background-color: #ddd;
+	border-width: 1px;
+	border-radius: 20px;
+	box-shadow: none;
+}
+
+.glyp-green {
+	color: green;
+	font-size: 17pt;
+}
+
+.glyp-pause {
+	color: #f5c759;
+	font-size: 17pt;
+}
+
+.btn-play {
+	padding: 2px 8px;
+}
+
+
+
+.subTaskInfoBtn {
+	float: right;
+	font-size: 16pt;
+	color:rgb(190, 190, 190);
+	top: -2px;
+}
+
+.currentTimeLabel {
+	font-size: 12pt;
+}
+
+.label {
+	font-size: 12pt;
+}
+
+/*We will import 2 fonts*/
+/*fontawesome iconfont*/
+@import url("http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css");
+
+
+/*Adding custom checkbox icons*/
+label[for*="chk"] {
+	position: relative;
+	padding-left: 30px;
+	font-size: 14px;
+	cursor: pointer;
+	bottom:10px;
+}
+
+label[for*="chk"]:before, label[for*="chk"]:after {
+	font-family: FontAwesome;
+	font-size: 21px;
+	/*absolutely positioned*/
+	position: absolute;
+	top: 0; left: 0;
+	
+/*	position: absolute; top: 0; left: 0;*/
+}
+label[for*="chk"]:before {
+	content: '\f096'; /*unchecked*/
+}
+label[for*="chk"]:after {
+	content: '\f046'; /*checked*/
+	/*checked icon will be hidden by default by using 0 max-width and overflow hidden*/
+	max-width: 0;
+	overflow: hidden;
+	opacity: 0.5;
+	/*CSS3 transitions for animated effect*/
+	transition: all 0.35s;
+}
+
+
+
+/*hiding the original checkboxes*/
+input[type="checkbox"] {
+	display: none;
+}
+
+
+
+
+/*when the user checks the checkbox the checked icon will animate in*/
+input[type="checkbox"]:checked + label[for*="chk"]:after{
+	max-width: 25px; /*an arbitratry number more than the icon's width*/
+	opacity: 1; /*for fade in effect*/
+}
+
+
+
+
+.taskInfo {
+    background-color: #f5f5f5;
+    border-radius: 0px 0px 10px 10px;
+    padding-right: 5px;
+    padding-left: 5px;
+    padding-bottom: 1px;
+    margin-bottom: 4px;
+}

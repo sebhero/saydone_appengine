@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html ng-app="taskListApp">
+<head>
+    <title></title>
+    <!-- Latest compiled and minified CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="css/bootstrap-theme.css">
+</head>
+<body ng-controller="simpleCtrl">
+    <br/>
+    <div class="container" >
+
+
+        <br/>
+        <h3>List of tasks</h3>
+        <ul>
+            <li ng-repeat="task in taskList | filter:newTask">{{task.title}}
+            <a href="" ng-click="removeTask(task)">Remove</a>
+            </li>
+        </ul>
+        {{newTask}}
+        <br/>
+        <!--<input type="text" ng-model="newTask">-->
+        <!--<button ng-click="addName()">add task</button>-->
+
+        <form ng-submit="addTask()">
+            <input type="text" ng-model="enteredTask">
+            <input class="btn btn-primary" type="submit" value="add">
+        </form>
+    </div>
+    <!--TODO must be on server.. otherwise https doesnt work.-->
+<!-- Latest compiled and minified JavaScript -->
+
+<script type="application/javascript" language="JavaScript" src="js/angular-1.2.25/angular.js" ></script>
+<script src="js/angular-1.2.25/angular-resource.js"></script>
+<script src="js/jquery-2.1.1.min.js"></script>
+<script src="js/bootstrap.js"></script>
+<!--<script src="https://apis.google.com/js/client.js?onload=init"></script>-->
+
+<script type="application/javascript">
+
+    console.log("hello 3");
+//    var google_scopes = 'https://www.googleapis.com/auth/userinfo.email';
+//    var google_client_id = '721477199484-4sv11th1kbmtpfuovj1gvv5qcsn9r9na.apps.googleusercontent.com';
+//    function init() {
+//        console.log("loaded init");
+//        var apisToLoad;
+//
+//        //called when server connection is setup
+//        var callback = function() {
+//
+//            if (--apisToLoad == 0) {
+//                //auto logon
+//                // signin(true, handleAuth);
+//            }
+//            //load the list from server
+//            listTasks();
+//        }
+//
+//        apisToLoad = 2;
+//        //Parameters are APIName,APIVersion,CallBack function,API Root
+//        var apiRoot = '//' + window.location.host + '/_ah/api';
+//        gapi.client.load('taskitemendpoint', 'v1', callback, apiRoot);
+//        gapi.client.load('oauth2','v2',callback);
+//
+//
+//
+//        //check for localstorage.
+//        if(localStorage["tasklist"])
+//        {
+////	taskList = JSON.parse(localStorage["tasklist"]);
+//            taskList = JSON.parse(localStorage.getItem("tasklist"));
+//            //load all the task to list.
+//            taskList.forEach(function(taskItem)
+//            {
+//                if(taskItem !=0)
+//                {
+//                    insertTask2(taskItem,taskItem.taskID);
+//                    updateGuiForTask(taskItem);
+//                }
+//
+//            });
+//            console.log("done loading from localestorage");
+//        }
+//        else
+//        {
+//            console.log("no storage");
+//            $('#errorPanel').append("Problem with localstorage: ");
+//            taskList = [];
+//            taskList.push(0); //TODO fix fulhack for JDO auto funkara inte
+//        }
+//
+//        document.getElementById('loginBtn').onclick = function() {
+//            signin(false,handleAuth);
+//        }
+//        document.getElementById('logoutBtn').onclick = function() {
+//            signout();
+//        }
+//
+//    }
+
+    var taskListApp = angular.module("taskListApp",['ngResource'])
+         .factory('SimpleFactory', function($resource)
+            {
+//                var factory={};
+//                var taskList=[
+//                    {title:"Diska"},
+//                    {title:"Tvatta"},
+//                    {title:"Skicka post"},
+//                    {title:"Betala hyran"}
+//                ];
+//                factory.getTasks = function()
+//                {
+//                    return taskList;
+//                };
+//                return factory;
+//                var factory = $resource('/_ah/api/testtaskendpoint/v1/testtask/:id');
+                return $resource('_ah/api/testtaskendpoint/v1/testtask/:id', { id: '@_id'},
+                    {
+                        update:{
+                        method: 'PUT' //this method issues a PUT request
+                        },
+                        query:{
+                            method: 'GET',
+                            isArray: false
+
+                        }
+                    });
+            });
+
+    var controllers = {};
+    controllers.simpleCtrl = function($scope, SimpleFactory)
+    {
+
+        console.log("id is "+$scope.id);
+        $scope.id = 4785074604081152;
+
+        var singleEntry= SimpleFactory.get({ id: $scope.id }, function()
+        {
+            console.log("singel: "+JSON.stringify(singleEntry));
+        });//get return single testask
+
+
+        var entries= SimpleFactory.query(function()
+        {
+            console.log(JSON.stringify(entries));
+            console.log("not string "+entries.items);
+        });
+
+//        $scope.entry = new SimpleFactory(); //inst resource class
+//
+//        $scope.entry.title = "the new task";
+//
+//        SimpleFactory.save($scope.entry, function()
+//        {
+//            //saved the data
+//            //do something
+//        });
+
+//        $scope.taskList=simpleFactory.getTasks();
+        //removes task from list
+        $scope.removeTask = function(task)
+        {
+//            var i = $scope.taskList.indexOf(task);
+//            $scope.taskList.splice(i,1);
+//            //TODO remove from server
+        };
+
+        $scope.addTask= function() {
+//            //TODO do validation on input
+//            console.log("new taskname "+$scope.enteredTask);
+//            $scope.taskList.push({title:$scope.enteredTask});
+//            $scope.enteredTask = '';
+//            //TODO add to server
+        };
+    };
+
+    taskListApp.controller(controllers);
+
+
+
+</script>
+
+
+
+</body>
+</html>

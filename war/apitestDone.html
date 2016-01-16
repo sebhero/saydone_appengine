@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Say Done</title>
+</head>
+<body>
+
+    <div id="login">
+       <input id="loginButton" type="button" value="Login"/>
+    </div>
+    <form action="javascript:void(0);">
+        <h2>List Tasks</h2>
+        <div><input id="listQuote" type="submit" value="List Quotes"></div>
+    </form>
+    <div id="listQuotesResult"></div>
+    
+    <form action="javascript:void(0);">
+      <h2>Insert New task</h2>
+         <div><input id="txtAuthorName" placeholder="Author name here"></input></div>
+         <div><input id="txtMessage" placeholder="Quote text here"></input></div>
+         <div><input id="insertQuote" type="submit" value="Insert Quote"></div>
+    </form>
+    
+    <form action="javascript:void(0);">
+      <h2>Update task</h2>
+         <div><input id="editQuoteID" placeholder="Quote ID value"></input></div>
+         <div><input id="editAuthorName" placeholder="Author name here"></input></div>
+         <div><input id="editMessage" placeholder="Quote text here"></input></div>
+         <div><input id="updateQuote" type="submit" value="Update Quote"></div>
+    </form>
+    
+    
+    <form action="javascript:void(0);">
+      <h2>Delete task</h2>
+         <div><input id="quoteID" placeholder="Quote ID value"></input></div>
+         <div><input id="deleteQuote" type="submit" value="Delete Quote"></div>
+    </form>
+    
+    
+    <script type="text/javascript">
+    
+        var scopes = 'https://www.googleapis.com/auth/userinfo.email';
+        var client_id = '721477199484-4sv11th1kbmtpfuovj1gvv5qcsn9r9na.apps.googleusercontent.com';
+    
+        function handleAuth() {
+    	  var request = gapi.client.oauth2.userinfo.get().execute(function(resp) {
+    	    if (!resp.code) {
+    	      // User is signed in, so hide the button
+    	      document.getElementById('loginButton').style.visibility = 'hidden';
+    	      document.getElementById('login').innerText = 'Welcome ' + resp.name;
+    	    }
+    	    else {
+    	    	document.getElementById('loginButton').style.visibility = '';
+    	    }
+    	  });
+    	}
+        
+        function signin(mode, callback) {
+        	  gapi.auth.authorize({client_id: client_id,scope: scopes, immediate: mode},callback);
+        }
+    
+        function init() {
+        	var apisToLoad;
+        	var callback = function() {
+        	   if (--apisToLoad == 0) {
+        	     signin(true, handleAuth);
+        	   }
+        	}
+        	  
+        	apisToLoad = 2;
+        	//Parameters are APIName,APIVersion,CallBack function,API Root 
+        	//gapi.client.load('taskitemendpoint', 'v1', callback, 'http://localhost:8888/_ah/api');
+        	gapi.client.load('taskitemendpoint', 'v1', callback, 'https://seb-testing.appspot.com/_ah/api');
+        	//gapi.client.load('oauth2','v2',callback);
+        	
+        	
+        	document.getElementById('listQuote').onclick = function() {
+        	    listQuotes();
+        	  }
+        	
+        	document.getElementById('insertQuote').onclick = function() {
+        		insertQuote();
+        	}
+        	
+        	document.getElementById('updateQuote').onclick = function() {
+        		updateQuote();
+        	}
+        	
+        	document.getElementById('deleteQuote').onclick = function() {
+        		deleteQuote();
+        	}
+        	
+        	document.getElementById('loginButton').onclick = function() {
+        		signin(false,handleAuth);
+        	}
+        }
+        
+        //List Quotes function that will execute the listQuote call
+        function listQuotes() {
+            console.log("list stuff");
+        	gapi.client.taskitemendpoint.listTaskItem().execute(function(resp) {
+        		if (!resp.code) {
+        			resp.items = resp.items || [];
+        			var result = "";
+        			for (var i=0;i<resp.items.length;i++) {
+        				result = result+ "<b>" + resp.items[i].title + "</b>" + "[" + resp.items[i].id + "]" + "<br/>";
+        			}
+        			document.getElementById('listQuotesResult').innerHTML = result;
+        		}
+        	});
+        }
+        
+        //Insert Quote function
+        function insertQuote() {
+        	//Validate the entries
+        	var _AuthorName = document.getElementById('txtAuthorName').value;
+        	var _Message = document.getElementById('txtMessage').value;
+        	
+        	//Build the Request Object
+        	var requestData = {};
+        	requestData.title = _AuthorName;
+        	requestData.parentId = 1;
+        	requestData.timeStamp = new Date();
+        	requestData.minTimeLasted = new Date();
+        	requestData.maxTimeLasted = new Date();
+        	requestData.avgTimeLasted = new Date();
+        	requestData.isTicking=false;
+        	requestData.isDone=false;
+        	
+        	gapi.client.taskitemendpoint.insertTaskItem(requestData).execute(function(resp) {
+        		console.log(resp);
+        		if (!resp.code) {
+        			//Just logging to console now, you can do your check here/display message
+        			console.log(resp.id + ":" + resp.titel);
+        		}
+        		else {
+        			console.log(resp.code + " : " + resp.titel);
+        			alert("Error : " + resp.code + ":" + resp.titel);
+        		}
+        	});
+        }
+        
+        //Update Quote function
+        function updateQuote() {
+        	//Validate the entries
+        	var _ID = document.getElementById("editQuoteID").value;
+        	var _AuthorName = document.getElementById('editAuthorName').value;
+        	var _Message = document.getElementById('editMessage').value;
+        	
+        	//Build the Request Object
+        	var requestData = {};
+        	requestData.id = _ID;
+        	requestData.author = _AuthorName;
+        	requestData.message = _Message;
+        	gapi.client.quoteendpoint.updateQuote(requestData).execute(function(resp) {
+        		if (!resp.code) {
+        			//Just logging to console now, you can do your check here/display message
+        			console.log(resp.id + ":" + resp.author + ":" + resp.message);
+        		}
+        	});
+        }
+        
+        //Delete Quote function
+        function deleteQuote() {
+        	//Validate the entries
+        	var _ID = document.getElementById('quoteID').value;
+        	
+        	//Build the Request Object
+        	var requestData = {};
+        	requestData.id = _ID;
+        	console.log(requestData);
+        	gapi.client.quoteendpoint.removeQuote(requestData).execute(function(resp) {
+        		//Just logging to console now, you can do your check here/display message
+        		console.log(resp);
+        	});
+        }
+        
+    </script>
+    <script src="https://apis.google.com/js/client.js?onload=init"></script>
+</body>
+</html>

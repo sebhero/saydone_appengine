@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="shortcut icon" href="">
+        <title>Starter Template for Bootstrap</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="./css/bootstrap.css" rel="stylesheet">
+        <link href="./css/bootstrap-theme.min.css" rel="stylesheet">
+        <link href="./css/main.css" rel="stylesheet">
+
+        <!-- Custom styles for this template -->
+        <style>body{padding-top:50px;}.starter-template{padding:40px 15px;text-align:center;}</style>
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top" appRole="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Project name</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </nav>
+        <div class="container">
+            <div class="starter-template">
+                <h1>Say Done!</h1>
+                <p class="lead">A simple Task - todo list and measure performance app.</p>
+            </div>
+<!--					End of start info-->
+						<div class="bs-surround">
+							<h3>Add a new Task</h3>
+								<form class="form-horizontal" appRole="form" action="javascript:void(0);">
+									<div class="form-group">
+										<label for="inputTitle" class="col-sm-2 control-label">Title</label>
+										<div class="col-sm-6">
+											<input type="text" class="form-control" id="inputTitle" placeholder="Title of task">
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="col-sm-offset-2 col-sm-10">
+											<button id="insertTask" type="submit" class="btn btn-default">Add Task</button>
+										</div>
+									</div>
+							</form>						
+						</div>
+<!--					end of form-->
+					<div class="bs-surround">
+						<h3>List of Tasks</h3>
+						<ul>
+							<li> test item</li>
+						</ul>
+<!--						<select size="2" class="form-control" id="taskListSelect" onchange="getTaskInfo(this.selectedIndex,this.options[this.selectedIndex].value)">-->
+						
+						<select size="2" class="form-control" id="taskListSelect">
+							<option data-value='{"title":"diska1","timestamp","123"}'>1 test</option>
+							<option data-value='{"title":"diska2","timestamp","123"}'>2 test</option>
+							<option data-value='{"title":"diska3","timestamp","123"}'>3 test</option>
+							<option data-value='{"title":"diska4","timestamp","123"}'>4 test</option>
+						</select>
+					</div>
+					
+					<div class="bs-surround">
+						<form class="form-horizontal">
+						<h4>Title: <span class="label label-primary">Diska</span></h4>
+						<h4>Timestamp: <span class="label label-primary">2014-01-01 12:30</span></h4>
+						<h4>Minimum time: <span class="label label-primary">5:30</span></h4>
+						<h4>Maximum time: <span class="label label-primary">12:30</span></h4>
+						<h4>Avrage time: <span class="label label-warning">8:30</span></h4>
+						<h4>Is running: <span class="label label-success">True</span></h4>
+							<br>
+						<h4>Current time: <span class="label label-default">1:13</span></h4>
+						<div class="btn-group">
+							<button type="button" class="btn btn-primary">Start</button>	
+							<button type="button" class="btn btn-default">Pause</button>	
+							<button type="button" class="btn btn-danger">Reset</button>	
+						</div>
+							
+						<h4>Are you done? <button class="btn btn-success">Finish!</button></h4>
+							
+						</form>
+					</div>
+					
+					
+        </div>
+<!--			end of container-->
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="js/jquery-2.1.1.min.js"></script>
+        <!-- compiled and minified Bootstrap JavaScript -->
+        <script src="js/bootstrap.js"></script>
+			
+				<script>
+					
+					//temp list of tasks
+					var taskList = [];
+					
+					document.getElementById('insertTask').onclick = function() {
+						insertTask();
+					}
+					
+					function insertTask()
+					{
+						//get title from input
+						var title = $('#inputTitle');
+						//get a number of the time
+						var timeStamp = Date.now();
+						var theTask = {};
+					}
+				
+					$("#taskListSelect").change(function(){
+//						 alert($(this).find(":selected").data("value").title);
+						var item= $(this).find(":selected").data("value");
+						alert(JSON.stringify(item));
+//					alert($(this).find(":selected").data("value").title);
+						
+					});
+					
+					function insertTask()
+					{}
+					
+//					function getTaskInfo(currentIndex,currentValue)
+//					{
+////						var temp = Date.now();
+////						var temp2 = new Date(temp);
+////						alert("index. "+currentIndex+" value: "+currentValue+" cur time ");
+//						alert('Index: ' + this.selectedIndex + '\nValue: ' + this.options[this.selectedIndex].value)
+//					}
+					
+				</script>
+    </body>
+</html>

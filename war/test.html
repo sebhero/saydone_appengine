@@ -1,0 +1,208 @@
+<!doctype html>
+<html ng-app="webApp">
+<head>
+
+    <!-- <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet"> -->
+    <link href="./css/bootstrap.css" rel="stylesheet">
+    <link href="./css/bootstrap-theme.min.css" rel="stylesheet">
+
+
+</head>
+<body>
+<div>
+    <h2>Endpoints Todos</h2>
+
+    <div ng-controller="TodoCtrl">
+        <div class="container">
+            <ul class="unstyled">
+                <li ng-repeat="todo in todos">
+                    <span>{{todo.title}}</span>
+                    <a href="" ng-click="removeTask(todo,$index)">Remove</a>
+                </li>
+            </ul>
+            <br>
+            <button ng-click="gettasks()">get Tasks google</button>
+            <button ng-click="signin()">Login to google</button>
+            <button ng-click="logoutGapi()">{{username}}logout from google</button>
+            <button ng-click="insert()">add gapi</button>
+            <button ng-click="checkAuth()">check auth</button>
+            <a href="https://www.google.com/accounts/Logout"
+               onclick="myIFrame.location='https://www.google.com/accounts/Logout';StartPollingForCompletion();return false;">
+                log out</a>
+            <iframe id="myIFrame"></iframe >
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.5/angular.min.js"></script>
+<script src="js/jquery-2.1.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<!--['$scope','$rootScope','$location','$window']-->
+<script>
+
+    'use strict';
+    function init() {
+        window.init(); // Calls the init function defined on the window
+
+    }
+
+    var google_scopes = 'https://www.googleapis.com/auth/userinfo.email';
+    var google_client_id = '721477199484-4sv11th1kbmtpfuovj1gvv5qcsn9r9na.apps.googleusercontent.com';
+
+    var app = angular.module('webApp', []);
+
+    app.factory('cloudendpoint', function ($q) {
+        return {
+            init: function () {
+                var ROOT = '//' + window.location.host + '/_ah/api';
+                var hwdefer = $q.defer();
+                var oauthloaddefer = $q.defer();
+                var oauthdefer = $q.defer();
+
+                gapi.client.load('taskitemendpoint', 'v1', function () {
+                    hwdefer.resolve(gapi);
+                }, ROOT);
+                gapi.client.load('oauth2', 'v2', function () {
+                    oauthloaddefer.resolve(gapi);
+                });
+                var chain = $q.all([hwdefer.promise, oauthloaddefer.promise]);
+                return chain;
+            },
+            doCall: function (callback) {
+                var p = $q.defer();
+                gapi.auth.authorize({client_id: google_client_id, scope: 'https://www.googleapis.com/auth/userinfo.email',
+                    immediate: true}, function () {
+                    var request = gapi.client.oauth2.userinfo.get().execute(function (resp) {
+                        if (!resp.code) {
+                            p.resolve(gapi);
+                        } else {
+                            p.reject(gapi);
+                        }
+                    });
+                });
+                return p.promise;
+            },
+            sigin: function (callback) {
+                gapi.auth.authorize({client_id: google_client_id, scope: 'https://www.googleapis.com/auth/userinfo.email',
+                    immediate: false}, callback);
+            },
+            signout: function()
+            {
+                gapi.auth.setToken(null);
+                //Todo now do logout stuff
+
+            }
+        }
+    });
+
+    app.controller('TodoCtrl', function ($scope, $rootScope, $location, $window, cloudendpoint) {
+
+//        $scope.todos = [1, 2, 3];
+
+        // the init function that will bridge the gapi initialize event with angular
+
+        $window.init = function () {
+
+            $scope.$apply($scope.initgapi);
+
+        };
+
+        $scope.initgapi = function () {
+
+            cloudendpoint.init().then(function () {
+                alert('inited');
+            }, function () {
+                alert('notinited')
+            });
+        }
+
+        $scope.gettasks = function () {
+
+            cloudendpoint.doCall().then(function () {
+
+//                gapi.client.testtaskendpoint.greetings.authed({}).execute(function (resp) {
+
+                gapi.client.taskitemendpoint.listTaskItem().execute(function (resp) {
+                    console.log("got response");
+                    $scope.todos =resp.items;
+                    $scope.$apply();
+                    //or use q
+                });
+
+            });
+        };
+
+        $scope.signin = function (loginform) {
+            console.log("sigining in");
+            gapi.auth.authorize({client_id: google_client_id,
+                        scope: 'https://www.googleapis.com/auth/userinfo.email', immediate: false
+                    },
+
+                    function () {
+                        alert('hello');
+                    }
+
+            );
+        };
+
+        $scope.insert = function()
+        {
+            console.log("inset called");
+            //cloudendpoint.doCall().then(function () {
+                console.log("adding task");
+                var newTask ={title:"new task"};
+                gapi.client.taskitemendpoint.insertTaskItem(newTask).execute(function (resp) {
+                    console.log("HELLO");
+                    console.log(resp);
+                    if (!resp.code) {
+                        //Just logging to console now, you can do your check here/display message
+                        console.log("succes! " + resp.id + ":" + resp.title);
+                        //console.log(JSON.stringify(resp));
+                        console.log("todos leng "+$scope.todos.length);
+                        $scope.todos.push(resp.result);
+                        console.log("todos leng AFter "+$scope.todos.length);
+
+                        //for localstorage
+                        //new object place.. if failed can be removed
+                        console.log("index: "+$scope.todos[$scope.todos.length-1]);
+                        $scope.$apply();
+                    }
+                    else {
+                        console.log("error " + resp.code + " : " + resp.titel);
+                    }
+                });
+            //});
+        };
+
+        $scope.checkAuth = function()
+        {
+            console.log("checking auth");
+          gapi.auth.authorize({client_id: google_client_id, scope: google_scopes, immediate: true}, handleAuthResult);
+        };
+
+        function handleAuthResult(authResult) {
+            //var authorizeButton = document.getElementById('authorize-button');
+            if (authResult && !authResult.error) {
+                //authorizeButton.style.visibility = 'hidden';
+                //makeApiCall();
+
+                console.log("auth> "+JSON.stringify(authResult));
+
+            }
+            if(authResult.error)
+            {
+                console.log("auth error> "+JSON.stringify(authResult));
+            }
+        };
+
+
+        //end of controller
+    });
+</script>
+
+<script src="https://apis.google.com/js/client.js?onload=init"></script>
+
+
+</body>
+</html>

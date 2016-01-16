@@ -1,0 +1,9 @@
+
+.bs-surround {
+	margin: 5px;
+	padding: 6px 10px 5px 10px ;
+	background-color: #ddd;
+	border-width: 1px;
+	border-radius: 20px;
+	box-shadow: none;
+}
